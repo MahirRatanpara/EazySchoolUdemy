@@ -1,11 +1,11 @@
 package com.mahir.springboot.controller;
 
 import com.mahir.springboot.model.Holiday;
+import org.springframework.expression.spel.ast.ValueRef;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @Controller
 public class HolidaysController {
 
-    @GetMapping("/holidays")
-    public String displayHolidays(@RequestParam(required = false) Boolean festival, @RequestParam(required = false) Boolean federal, Model model) {
+    @GetMapping("/holidays/{display}")
+    public String displayHolidays(@PathVariable String display, Model model) {
         List<Holiday> holidays = Arrays.asList(
                 new Holiday(" Jan 1 ","New Year's Day", Holiday.Type.FESTIVAL),
                 new Holiday(" Oct 31 ","Halloween", Holiday.Type.FESTIVAL),
@@ -31,8 +31,20 @@ public class HolidaysController {
             model.addAttribute(type.toString(),
                     (holidays.stream().filter(holiday -> holiday.getType().equals(type)).collect(Collectors.toList())));
         }
-        model.addAttribute("festival", festival);
-        model.addAttribute("federal", federal);
+
+        switch (display) {
+            case "all":
+                model.addAttribute("festival", true);
+                model.addAttribute("federal", true);
+                break;
+            case "festival":
+                model.addAttribute("festival", true);
+                break;
+            case "federal":
+                model.addAttribute("federal", true);
+                break;
+        }
+
         return "holidays.html";
     }
 }
